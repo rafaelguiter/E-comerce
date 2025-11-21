@@ -1,0 +1,64 @@
+{% load omfilters %}
+
+<nav class="navbar navbar-dark bg-primary navbar-expand-lg">
+    <div class="container w-100 d-flex justify-content-between align-items-center">
+        <!-- Marca -->
+        <a class="navbar-brand" href="{% url 'produto:lista' %}">Shoope -- FY</a>
+
+        <!-- Formulário centralizado -->
+        <form class="d-flex" method="GET" action="{% url 'produto:busca' %}" style="flex: 1; max-width: 600px; margin: 0 20px;">
+            <input name="termo" value="{{ request.GET.termo }}" 
+                   class="form-control mr-2" 
+                   type="search" 
+                   placeholder="Busca" 
+                   aria-label="Busca"
+                   style="flex: 1; font-size: 1.1rem; padding: .5rem 1rem;">
+            <button class="btn btn-secondary" type="submit" style="font-size: 1.1rem;">Busca</button>
+        </form>
+
+        <!-- Menu à direita -->
+        <ul class="navbar-nav d-flex flex-row">
+
+            {% if request.session.carrinho %}
+                <li class="nav-item mx-2">
+                    <a class="nav-link nav-cart-link active" href="{% url 'produto:carrinho' %}">
+                        <span class="nav-cart-text mr-1">
+                            Carrinho
+                        </span>
+                        <span class="nav-cart-count mr-1">
+                            <strong>{{ request.session.carrinho|cart_total_qtd }}x</strong>
+                        </span>
+                        <span class="nav-cart-icon mr-2">
+                            <i class="fas fa-shopping-cart"></i>
+                        </span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% if request.user.is_authenticated %}
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="#">Olá, {{ user.username }}</a>
+                </li>
+                <li class="nav-item dropdown mx-2">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Conta
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="{% url 'pedido:lista' %}">Meus pedidos</a>
+                        <a class="dropdown-item" href="{% url 'perfil:criar' %}">Atualizar meus dados</a>
+                        <a class="dropdown-item" href="{% url 'perfil:logout' %}">Sair</a>
+                    </div>
+                </li>
+            {% else %}
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="{% url 'perfil:criar' %}">Entrar</a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a class="nav-link" href="{% url 'perfil:registro' %}">Criar conta</a>
+                </li>
+            {% endif %}
+
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,20 @@
+{% extends 'perfil/registro.html' %}
+{% load crispy_forms_tags %}
+
+{% block titulo %}Atualizar perfil de {{ user.username }} | {% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 mt-3">
+        <h4>Atualizar Cadastro</h4>
+        <p>Utilize o formulário a seguir para atualizar seus dados.</p>
+
+        <form method="POST" action="{% url 'perfil:atualizar' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ userform|crispy }}
+            {{ perfilform|crispy }}
+            <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">Salvar Alterações</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

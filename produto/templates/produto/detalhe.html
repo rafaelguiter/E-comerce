@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load omfilters %}
+
+{% block titulo %}{{ produto.nome }} | {% endblock %}
+
+{% block conteudo %}
+<div class="row">
+    <div class="col-lg">
+        <div class="row no-gutters">
+            <div class="col-lg-12">
+                {% if produto.imagem %}
+                <img class="img-fluid" src="{{ produto.imagem.url }}">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg">
+        <div class="mt-4 mt-lg-0">
+            <h1 class="h2">{{ produto.nome }}</h1>
+            <p class="lead">{{ produto.descricao_curta }}</p>
+
+            <p class="lead">
+                {% if produto.preco_marketing_promocional %}
+                <span id="variation-preco-promocional" class="lead product-price">
+                    {{ produto.preco_marketing_promocional|formata_preco }}
+                </span>
+                <span id="variation-preco" class="lead product-old-price text-muted">
+                    {{ produto.preco_marketing|formata_preco }}
+                </span>
+                {% else %}
+                <span id="variation-preco" class="lead product-price">
+                    {{ produto.preco_marketing|formata_preco }}
+                </span>
+                {% endif %}
+            </p>
+
+            <form action="{% url 'produto:adicionaraocarrinho' %}" id="form-add-to-cart">
+                
+                <!-- Seleção das variações -->
+                <div class="form-group">
+                    <select id="select-variacoes" name="vid" class="form-control form-control-lg">
+                        {% for variacao in produto.variacao_set.all %}
+                            {% if variacao.preco_promocional %}
+                                <option data-preco="{{ variacao.preco|formata_preco }}"
+                                        data-preco-promocional="{{ variacao.preco_promocional|formata_preco }}"
+                                        value="{{ variacao.id }}">
+                                    {{ variacao.nome|default:variacao }}
+                                </option>
+                            {% else %}
+                                <option data-preco="{{ variacao.preco|formata_preco }}"
+                                        value="{{ variacao.id }}">
+                                    {{ variacao.nome|default:variacao }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Cidades cadastradas -->
+                <div class="form-group mt-4">
+                    <label for="cidade"><strong>Calcular Frete</strong></label>
+
+                    <select id="cidade" name="cidade" class="form-control form-control-lg">
+                        <option value="">Selecione sua cidade</option>
+                        {% for c in cidades %}
+                            <option value="{{ c.nome }}">{{ c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Botão calcular -->
+                <div class="form-group">
+                    <button type="button" id="btn-frete"
+                            class="btn btn-outline-primary btn-lg btn-block">
+                        Calcular Frete
+                    </button>
+                </div>
+
+                <!-- Resultado Frete -->
+                <div id="resultado-frete"
+                     class="mt-2 mb-3"
+                     style="font-size: 1.3rem; font-weight: bold;">
+                </div>
+
+                <!-- Botão adicionar ao carrinho -->
+                <div class="text-left mb-3">
+                    
+                    <!--
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
+                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                        Adicionar ao carrinho
+                    </button>
+                    -->
+
+                    <button type="submit" id="btn-add-cart" class="btn btn-primary btn-lg btn-block">
+                     <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                        Adicionar ao carrinho
+                    </button>
+
+                    <!-- Mensagem avisando sobre o frete -->
+                    <div id="mensagem-frete" class="mt-2" style="color: red; font-weight: bold; display: none;">
+                        Você precisa calcular o frete antes de adicionar ao carrinho.
+                    </div>
+
+                </div>
+
+                <!-- Botão comprar -->
+                <div class="text-left">
+                    <a href="{% url 'produto:carrinho' %}" class="btn btn-success btn-lg btn-block">
+                        Comprar
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-lg-12">
+        <h2 class="text-center">{{ produto.nome }}</h2>
+        {{ produto.descricao_longa|linebreaks }}
+    </div>
+</div>
+
+<!-- SCRIPT AJAX CALCULAR FRETE -->
+
+<!--
+<script>
+document.getElementById("btn-frete").addEventListener("click", function () {
+    const cidade = document.getElementById("cidade").value;
+    const resultado = document.getElementById("resultado-frete");
+
+    if (!cidade) {
+        resultado.innerHTML = "<span class='text-danger'>Selecione uma cidade.</span>";
+        return;
+    }
+
+    fetch("{% url 'produto:calcular_frete' %}?cidade=" + encodeURIComponent(cidade))
+        .then(response => response.json())
+        .then(data => {
+            resultado.innerHTML = "Frete: R$ " + data.frete.toFixed(2).replace('.', ',');
+        })
+        .catch(() => {
+            resultado.innerHTML = "<span class='text-danger'>Erro ao calcular frete.</span>";
+        });
+});
+</script>
+-->
+
+<script>
+const btnAdd = document.getElementById("btn-add-cart");
+const mensagemFrete = document.getElementById("mensagem-frete");
+const btnFrete = document.getElementById("btn-frete");
+const selectCidade = document.getElementById("cidade");
+
+let freteCalculado = false; // controla se o frete foi calculado
+
+// Quando calcular frete com sucesso
+btnFrete.addEventListener("click", function () {
+    const cidade = selectCidade.value;
+    const resultado = document.getElementById("resultado-frete");
+
+    if (!cidade) {
+        resultado.innerHTML = "<span class='text-danger'>Selecione uma cidade.</span>";
+        freteCalculado = false;
+        return;
+    }
+
+    fetch("{% url 'produto:calcular_frete' %}?cidade=" + encodeURIComponent(cidade))
+        .then(response => response.json())
+        .then(data => {
+            resultado.innerHTML = "Frete: R$ " + data.frete.toFixed(2).replace('.', ',');
+            freteCalculado = true;
+            mensagemFrete.style.display = 'none'; // esconde a mensagem
+        })
+        .catch(() => {
+            resultado.innerHTML = "<span class='text-danger'>Erro ao calcular frete.</span>";
+            freteCalculado = false;
+        });
+});
+
+// Intercepta o envio do formulário
+btnAdd.addEventListener("click", function(e) {
+    if (!freteCalculado) {
+        e.preventDefault(); // previne envio do formulário
+        mensagemFrete.style.display = 'block'; // mostra a mensagem em vermelho
+    }
+});
+</script>
+
+{% endblock %}
