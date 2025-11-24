@@ -1,4 +1,5 @@
 from django.contrib.messages import constants
+from decouple import config
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -9,7 +10,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '34s66f2twc8c&q*i_@@4i(yp7wp0-d_hi3il7%1iom55xz(87w'
+SECRET_KEY = config('DJANGO_SECRET_KEY')
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
+STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -72,7 +75,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'loja.wsgi.application'
 
 
-"""
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -84,23 +86,21 @@ DATABASES = {
     }
 }
 
-"""
 
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'vendas',   # nome do banco que você criou no MySQL
-        'USER': 'root',            # ou outro usuário configurado
-        'PASSWORD': '1234',   # senha do usuário MySQL
-        'HOST': '127.0.0.1',       # ou o IP do servidor MySQL
-        'PORT': '3306',            # porta padrão do MySQL
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-        },
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'vendas',   # nome do banco que você criou no MySQL
+#         'USER': 'root',            # ou outro usuário configurado
+#         'PASSWORD': '1234',   # senha do usuário MySQL
+#         'HOST': '127.0.0.1',       # ou o IP do servidor MySQL
+#         'PORT': '3306',            # porta padrão do MySQL
+#         'OPTIONS': {
+#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+#         },
+#     }
+# }
 
 
 

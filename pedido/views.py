@@ -1,20 +1,23 @@
-from django.shortcuts import redirect, reverse
+from django.shortcuts import redirect, reverse, get_object_or_404, render
 from django.views.generic import ListView, DetailView
 from django.views import View
-# from django.http import HttpResponse
 from django.contrib import messages
+from django.conf import settings
 
 from produto.models import Variacao
 from .models import Pedido, ItemPedido
-
 from utils import utils
+
+import stripe
+
+# Configura a chave secreta da Stripe (definida em settings.py)
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class DispatchLoginRequiredMixin(View):
     def dispatch(self, *args, **kwargs):
         if not self.request.user.is_authenticated:
             return redirect('perfil:criar')
-
         return super().dispatch(*args, **kwargs)
 
     def get_queryset(self, *args, **kwargs):
@@ -28,6 +31,50 @@ class Pagar(DispatchLoginRequiredMixin, DetailView):
     model = Pedido
     pk_url_kwarg = 'pk'
     context_object_name = 'pedido'
+
+    def post(self, request, *args, **kwargs):
+        """
+        Ao clicar no botão 'Pagar', criamos uma Session do Stripe Checkout
+        e redirecionamos o usuário para a página segura de pagamento.
+        """
+        pedido = self.get_object()
+
+        # Stripe espera valor em centavos (inteiro)
+        valor_centavos = int(pedido.total * 100)
+
+        try:
+            checkout_session = stripe.checkout.Session.create(
+                mode='payment',
+                payment_method_types=['card'],
+                line_items=[
+                    {
+                        'price_data': {
+                            'currency': 'brl',
+                            'product_data': {
+                                'name': f'Pedido #{pedido.id}',
+                            },
+                            'unit_amount': valor_centavos,
+                        },
+                        'quantity': 1,
+                    },
+                ],
+                metadata={
+                    'pedido_id': pedido.id,
+                    'user_id': request.user.id,
+                },
+                success_url=request.build_absolute_uri(
+                    reverse('pedido:pagamento_sucesso', kwargs={'pk': pedido.id})
+                ) + '?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url=request.build_absolute_uri(
+                    reverse('pedido:pagamento_cancelado', kwargs={'pk': pedido.id})
+                ),
+            )
+        except Exception as e:
+            messages.error(request, f'Erro ao iniciar pagamento: {e}')
+            return redirect('pedido:pagar', pk=pedido.id)
+
+        # Redireciona para a URL do checkout da Stripe
+        return redirect(checkout_session.url)
 
 
 class SalvarPedido(View):
@@ -68,20 +115,20 @@ class SalvarPedido(View):
             if estoque < qtd_carrinho:
                 carrinho[vid]['quantidade'] = estoque
                 carrinho[vid]['preco_quantitativo'] = estoque * preco_unt
-                carrinho[vid]['preco_quantitativo_promocional'] = estoque * \
-                    preco_unt_promo
+                carrinho[vid]['preco_quantitativo_promocional'] = estoque * preco_unt_promo
 
-                error_msg_estoque = 'Estoque insuficiente para alguns '\
-                    'produtos do seu carrinho. '\
-                    'Reduzimos a quantidade desses produtos. Por favor, '\
+                error_msg_estoque = (
+                    'Estoque insuficiente para alguns '
+                    'produtos do seu carrinho. '
+                    'Reduzimos a quantidade desses produtos. Por favor, '
                     'verifique quais produtos foram afetados a seguir.'
+                )
 
             if error_msg_estoque:
                 messages.error(
                     self.request,
                     error_msg_estoque
                 )
-
                 self.request.session.save()
                 return redirect('produto:carrinho')
 
@@ -92,9 +139,8 @@ class SalvarPedido(View):
             usuario=self.request.user,
             total=valor_total_carrinho,
             qtd_total=qtd_total_carrinho,
-            status='C',
+            status='C',  # Ex.: "Criado / Aguardando pagamento"
         )
-
         pedido.save()
 
         ItemPedido.objects.bulk_create(
@@ -118,9 +164,7 @@ class SalvarPedido(View):
         return redirect(
             reverse(
                 'pedido:pagar',
-                kwargs={
-                    'pk': pedido.pk
-                }
+                kwargs={'pk': pedido.pk}
             )
         )
 
@@ -138,3 +182,37 @@ class Lista(DispatchLoginRequiredMixin, ListView):
     template_name = 'pedido/lista.html'
     paginate_by = 10
     ordering = ['-id']
+
+
+def pagamento_sucesso(request, pk):
+    """
+    Página de retorno quando a Stripe redireciona após pagamento concluído.
+    (Para produção, o ideal é validar via webhook; aqui é atalho para MVP/faculdade.)
+    """
+    if not request.user.is_authenticated:
+        return redirect('perfil:criar')
+
+    pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
+
+    # Atalho: marcar como aprovado
+    pedido.status = 'A'  # Ex.: "Aprovado"
+    pedido.save()
+
+    messages.success(request, 'Pagamento confirmado! Obrigado pela sua compra.')
+    return render(request, 'pedido/pagamento_sucesso.html', {'pedido': pedido})
+
+
+def pagamento_cancelado(request, pk):
+    """
+    Página de retorno quando o usuário cancela ou não conclui o pagamento na Stripe.
+    """
+    if not request.user.is_authenticated:
+        return redirect('perfil:criar')
+
+    pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
+
+    messages.warning(
+        request,
+        'Pagamento não foi concluído. Você pode tentar novamente.'
+    )
+    return render(request, 'pedido/pagamento_cancelado.html', {'pedido': pedido})

@@ -16,8 +16,8 @@
                 </small>
             </div>
             <div class="card-body">
-                <form>
-
+                <!-- Apenas UI (sem envio), então usamos uma DIV em vez de FORM -->
+                <div>
                     <div class="custom-control custom-radio mb-3">
                         <input type="radio" id="pagamento-cartao" name="metodo_pagamento" class="custom-control-input"
                             checked>
@@ -30,25 +30,31 @@
                     </div>
 
                     <div class="custom-control custom-radio mb-3">
-                        <input type="radio" id="pagamento-pix" name="metodo_pagamento" class="custom-control-input">
-                        <label class="custom-control-label" for="pagamento-pix">
+                        <input type="radio" id="pagamento-pix" name="metodo_pagamento" class="custom-control-input"
+                            disabled>
+                        <label class="custom-control-label text-muted" for="pagamento-pix">
                             Pix
                             <span class="d-block small text-muted">
-                                Confirmação rápida após o pagamento.
+                                (Em breve)
                             </span>
                         </label>
                     </div>
 
                     <div class="custom-control custom-radio mb-3">
-                        <input type="radio" id="pagamento-boleto" name="metodo_pagamento" class="custom-control-input">
-                        <label class="custom-control-label" for="pagamento-boleto">
+                        <input type="radio" id="pagamento-boleto" name="metodo_pagamento" class="custom-control-input"
+                            disabled>
+                        <label class="custom-control-label text-muted" for="pagamento-boleto">
                             Boleto bancário
                             <span class="d-block small text-muted">
-                                Compensação em até 2 dias úteis após o pagamento.
+                                (Em breve)
                             </span>
                         </label>
                     </div>
-                </form>
+
+                    <p class="small text-muted mt-3 mb-0">
+                        Pagamentos são processados com segurança pela Stripe em ambiente protegido.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -64,9 +70,14 @@
                 {% include 'parciais/_pedido.html' %}
             </div>
             <div class="card-footer bg-white">
-                <a href="#" class="btn btn-primary btn-block btn-lg">
-                    Pagar
-                </a>
+                <!-- Form que dispara o POST para a view Pagar (Stripe Checkout) -->
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        Pagar com cartão (Stripe)
+                    </button>
+                </form>
+
                 <a href="{% url 'produto:carrinho' %}" class="btn btn-link btn-sm btn-block mt-2">
                     <i class="fas fa-arrow-left mr-1"></i> Voltar ao carrinho
                 </a>
