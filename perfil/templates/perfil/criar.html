@@ -4,39 +4,53 @@
 {% block titulo %}Login | {% endblock %}
 
 {% block conteudo %}
-
 <div class="row justify-content-center mt-5">
-    <div class="col-lg-5 col-md-6 col-sm-12">
-        <h2 class="mb-4 text-center">Login</h2>
-        <p class="text-center">Entre com seu usuário e senha para acessar sua conta.</p>
+    <div class="col-lg-4 col-md-6 col-sm-10">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h3 class="mb-1">Entrar na conta</h3>
+                    <p class="text-muted mb-0">
+                        Acesse seus pedidos e dados cadastrados.
+                    </p>
+                </div>
 
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} mt-3" role="alert">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mb-3" role="alert">
                     {{ message }}
                 </div>
-            {% endfor %}
-        {% endif %}
+                {% endfor %}
+                {% endif %}
 
-        <form method="POST" action="{% url 'perfil:login' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="InputUsuario">Usuário</label>
-                <input type="text" name="username" class="form-control" id="InputUsuario"
-                       placeholder="Digite seu usuário" required>
-            </div>
-            <div class="form-group">
-                <label for="InputSenha">Senha</label>
-                <input type="password" name="password" class="form-control" id="InputSenha"
-                       placeholder="Digite sua senha" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">Entrar</button>
-        </form>
+                <form method="POST" action="{% url 'perfil:login' %}">
+                    {% csrf_token %}
 
-        <p class="text-center mt-3">
-            Ainda não tem cadastro? <a href="{% url 'perfil:registro' %}">Cadastre-se aqui</a>
-        </p>
+                    <div class="form-group">
+                        <label for="InputUsuario" class="font-weight-semibold">Usuário</label>
+                        <input type="text" name="username" class="form-control" id="InputUsuario"
+                            placeholder="Digite seu usuário" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="InputSenha" class="font-weight-semibold">Senha</label>
+                        <input type="password" name="password" class="form-control" id="InputSenha"
+                            placeholder="Digite sua senha" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">
+                        Entrar
+                    </button>
+                </form>
+
+                <p class="text-center mt-3 mb-0">
+                    <small class="text-muted">
+                        Ainda não tem cadastro?
+                        <a href="{% url 'perfil:registro' %}">Crie sua conta</a>
+                    </small>
+                </p>
+            </div>
+        </div>
     </div>
 </div>
-
 {% endblock %}

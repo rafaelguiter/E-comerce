@@ -4,79 +4,89 @@
 {% block titulo %}Carrinho | {% endblock %}
 
 {% block conteudo %}
-
-{% if carrinho %}
-
-<div class="row mt-3">
-    <div class="col">
-        <h3>Carrinho de compras</h3>
-        <p class="lead">Os produtos, quantidades e preços que você escolheu.</p>
-
-        {% include 'parciais/_carrinho.html' %}
-    </div>
-</div>
-
-
-
-<div class="row mt-3">
-    <div class="col-lg">
-        <p class='lead'>Total no carrinho</p>
-
-        <div class='table-responsive'>
-            <!--
-            <table class="table">
-                <tr>
-                    <td class="font-weight-bold">Total</td>
-                    <td>{{ carrinho|cart_totals|formata_preco }}</td>
-                </tr>
-            </table>
-            -->
-            <table class="table">
-                <tr>
-                    <td class="font-weight-bold">Subtotal</td>
-                    <td>R$ {{ subtotal|floatformat:2 }}</td>
-                </tr>
-                <tr>
-                    <td class="font-weight-bold">Frete</td>
-                    <td>R$ {{ frete|floatformat:2 }}</td>
-                </tr>
-                <tr>
-                    <td class="font-weight-bold text-success">Total Geral</td>
-                    <td class="text-success"><strong>R$ {{ total|floatformat:2 }}</strong></td>
-                </tr>
-            </table>
-
-
-
-
+<div class="row mt-4">
+    {% if carrinho %}
+    <!-- Lista de itens do carrinho -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">Carrinho de compras</h4>
+                    <small class="text-muted">Revise os itens antes de finalizar sua compra.</small>
+                </div>
+                <span class="badge badge-primary badge-pill">
+                    {{ carrinho|cart_total_qtd }} itens
+                </span>
+            </div>
+            <div class="card-body p-0">
+                {% include 'parciais/_carrinho.html' %}
+            </div>
         </div>
     </div>
-    <div class="col-lg mt-auto">
 
-        {% if request.user.is_authenticated %}
-        <a class="btn btn-lg btn-block btn-primary" href="{% url 'produto:resumodacompra' %}">
-            Comprar
+    <!-- Resumo do pedido -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Resumo do pedido</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-3">
+                    <tbody>
+                        <tr>
+                            <td class="text-muted">Subtotal</td>
+                            <td class="text-right">R$ {{ subtotal|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Frete</td>
+                            <td class="text-right">R$ {{ frete|floatformat:2 }}</td>
+                        </tr>
+                        <tr class="border-top">
+                            <td class="font-weight-bold text-success">Total geral</td>
+                            <td class="text-right font-weight-bold text-success">
+                                R$ {{ total|floatformat:2 }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="small text-muted mb-3">
+                    Os valores podem ser atualizados na etapa de confirmação do pedido.
+                </p>
+
+                {% if request.user.is_authenticated %}
+                <a class="btn btn-primary btn-lg btn-block" href="{% url 'produto:resumodacompra' %}">
+                    Finalizar compra
+                </a>
+                {% else %}
+                <a class="btn btn-primary btn-lg btn-block" href="{% url 'perfil:criar' %}">
+                    Entrar ou cadastrar e finalizar
+                </a>
+                <p class="small text-muted mt-2 mb-0">
+                    Você precisa estar logado para concluir a compra com segurança.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <a href="{% url 'produto:lista' %}" class="btn btn-link btn-sm p-0">
+            <i class="fas fa-arrow-left mr-1"></i> Continuar comprando
         </a>
-        {% else %}
-        <a class="btn btn-lg btn-block btn-primary" href="{% url 'perfil:criar' %}">
-            Entrar ou cadastrar e comprar
-        </a>
-        {% endif %}
     </div>
-</div>
 
-{% else %}
-
-<div class="row mt-3">
-    <div class="col">
-        <h3>Carrinho vazio</h3>
-        <p class="lead">Não há produtos no seu carrinho.</p>
+    {% else %}
+    <!-- Estado de carrinho vazio -->
+    <div class="col-12">
+        <div class="text-center py-5">
+            <h3 class="mb-3">Seu carrinho está vazio</h3>
+            <p class="lead text-muted mb-4">
+                Você ainda não adicionou nenhum produto ao carrinho.
+            </p>
+            <a href="{% url 'produto:lista' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-store mr-2"></i> Ver produtos
+            </a>
+        </div>
     </div>
+    {% endif %}
 </div>
-
-{% endif %}
-
-
-
-
 {% endblock %}

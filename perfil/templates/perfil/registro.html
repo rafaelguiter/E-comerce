@@ -1,23 +1,44 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
-{% block titulo %} Cadastro | {% endblock %}
+{% block titulo %}Cadastro | {% endblock %}
 
 {% block conteudo %}
-
 <div class="row justify-content-center mt-5">
-    <div class="col-lg-6">
-        <h4>Cadastro</h4>
-             <p>Preencha os campos abaixo para criar sua conta:</p>
-        <form method="POST" action="">
-            {% csrf_token %}
-            {{ userform|crispy }}
-            {{ perfilform|crispy }}
-            <button type="submit" class="btn btn-primary btn-block btn-lg">Enviar</button>
-        </form>
-        <p class="mt-3">Já tem conta? <a href="{% url 'perfil:criar' %}">Faça login aqui</a></p>
+    <div class="col-lg-6 col-md-8 col-sm-10">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <h3 class="mb-1">Criar conta</h3>
+                    <p class="text-muted mb-0">
+                        Preencha os campos abaixo para se cadastrar na loja.
+                    </p>
+                </div>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+
+                    <h6 class="text-uppercase text-muted mb-2">Dados de acesso</h6>
+                    <div class="border-top mb-3"></div>
+                    {{ userform|crispy }}
+
+                    <h6 class="text-uppercase text-muted mb-2 mt-3">Dados pessoais</h6>
+                    <div class="border-top mb-3"></div>
+                    {{ perfilform|crispy }}
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">
+                        Criar conta
+                    </button>
+                </form>
+
+                <p class="text-center mt-3 mb-0">
+                    <small class="text-muted">
+                        Já tem conta?
+                        <a href="{% url 'perfil:criar' %}">Faça login aqui</a>
+                    </small>
+                </p>
+            </div>
+        </div>
     </div>
 </div>
-
 {% endblock %}
-

@@ -1,25 +1,77 @@
 {% extends 'base.html' %}
-
-{% block titulo %}Pagamento | {% endblock %}
-
 {% load omfilters %}
 {% load static %}
 
+{% block titulo %}Pagamento | {% endblock %}
+
 {% block conteudo %}
-<div class="row">
-    <div class="col">
-        <h3>Escolha o método de pagamento</h3>
-        <p>Para o desenvolvedor: adicione seu método de pagamento preferido.</p>
+<div class="row mt-4 mb-5">
+    <!-- Coluna: Métodos de pagamento -->
+    <div class="col-lg-7 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light">
+                <h4 class="mb-0">Escolha o método de pagamento</h4>
+                <small class="text-muted">
+                    Selecione uma forma de pagamento para finalizar seu pedido.
+                </small>
+            </div>
+            <div class="card-body">
+                <form>
+
+                    <div class="custom-control custom-radio mb-3">
+                        <input type="radio" id="pagamento-cartao" name="metodo_pagamento" class="custom-control-input"
+                            checked>
+                        <label class="custom-control-label" for="pagamento-cartao">
+                            Cartão de crédito
+                            <span class="d-block small text-muted">
+                                Pague em até 12x, sujeito às condições do cartão.
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="custom-control custom-radio mb-3">
+                        <input type="radio" id="pagamento-pix" name="metodo_pagamento" class="custom-control-input">
+                        <label class="custom-control-label" for="pagamento-pix">
+                            Pix
+                            <span class="d-block small text-muted">
+                                Confirmação rápida após o pagamento.
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="custom-control custom-radio mb-3">
+                        <input type="radio" id="pagamento-boleto" name="metodo_pagamento" class="custom-control-input">
+                        <label class="custom-control-label" for="pagamento-boleto">
+                            Boleto bancário
+                            <span class="d-block small text-muted">
+                                Compensação em até 2 dias úteis após o pagamento.
+                            </span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coluna: Resumo do pedido + botão pagar -->
+    <div class="col-lg-5 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Resumo do pedido</h5>
+                <small class="text-muted">Revise antes de confirmar.</small>
+            </div>
+            <div class="card-body p-0">
+                {% include 'parciais/_pedido.html' %}
+            </div>
+            <div class="card-footer bg-white">
+                <a href="#" class="btn btn-primary btn-block btn-lg">
+                    Pagar
+                </a>
+                <a href="{% url 'produto:carrinho' %}" class="btn btn-link btn-sm btn-block mt-2">
+                    <i class="fas fa-arrow-left mr-1"></i> Voltar ao carrinho
+                </a>
+            </div>
+        </div>
     </div>
 </div>
-
-{% include 'parciais/_pedido.html' %}
-
-<div class="row mt-4">
-    <div class="col">
-        <a href="#" class="btn btn-primary btn-block btn-lg">Pagar</a>
-    </div>
-</div>
-
-
 {% endblock %}

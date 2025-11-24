@@ -6,16 +6,18 @@
     <title>{% block titulo %}{% endblock %}E-commerce</title>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     {% include 'parciais/_nav.html' %}
 
-    <main class="container mt-4 mb-4">
-        {% include 'parciais/_messages.html' %}
-        {% block conteudo %}{% endblock %}
+    <!-- main ocupa o espaço flexível entre nav e footer -->
+    <main class="flex-fill">
+        <div class="container mt-4 mb-4">
+            {% include 'parciais/_messages.html' %}
+            {% block conteudo %}{% endblock %}
+        </div>
     </main>
 
     {% include 'parciais/_footer.html' %}
-
 </body>
 
 </html>

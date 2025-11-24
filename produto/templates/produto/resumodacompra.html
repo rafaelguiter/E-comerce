@@ -4,79 +4,124 @@
 {% block titulo %}Resumo da compra | {% endblock %}
 
 {% block conteudo %}
+<div class="row mt-4 mb-5">
+    <!-- Dados do usuário e endereço -->
+    <div class="col-lg-7 mb-4">
+        <!-- Dados do usuário -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0">Seus dados</h4>
+                    <small class="text-muted">Confira se está tudo correto antes de finalizar.</small>
+                </div>
+                <a href="{% url 'perfil:criar' %}" class="btn btn-sm btn-outline-primary">
+                    Editar
+                </a>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 col-lg-3">Nome</dt>
+                    <dd class="col-sm-9 col-lg-9">{{ usuario.first_name }} {{ usuario.last_name }}</dd>
 
-<div class="row mb-5">
-    <div class="col-lg">
-        <h2>Resumo da sua compra</h2>
+                    <dt class="col-sm-3 col-lg-3">Idade</dt>
+                    <dd class="col-sm-9 col-lg-9">{{ usuario.perfil.idade }}</dd>
 
-        <p class="lead">Dados do usuário</p>
-        <p>Caso precise editar, <a href="{% url 'perfil:criar' %}">clique aqui</a></p>
-        <dl class="row">
-            <dt class="col-lg-2">Nome:</dt>
-            <dd class="col-lg-4">{{ usuario.first_name }}</dd>
-            <dt class="col-lg-2">Sobrenome:</dt>
-            <dd class="col-lg-4">{{ usuario.last_name }}</dd>
+                    <dt class="col-sm-3 col-lg-3">Nascimento</dt>
+                    <dd class="col-sm-9 col-lg-9">{{ usuario.perfil.data_nascimento }}</dd>
 
-            <dt class="col-lg-2">Idade:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.idade }}</dd>
-            <dt class="col-lg-2">Nascimento:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.data_nascimento }}</dd>
+                    <dt class="col-sm-3 col-lg-3">CPF</dt>
+                    <dd class="col-sm-9 col-lg-9">{{ usuario.perfil.cpf }}</dd>
 
-            <dt class="col-lg-2">CPF:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.cpf }}</dd>
-            <dt class="col-lg-2">E-mail:</dt>
-            <dd class="col-lg-4">{{ usuario.email }}</dd>
-        </dl>
+                    <dt class="col-sm-3 col-lg-3">E-mail</dt>
+                    <dd class="col-sm-9 col-lg-9">{{ usuario.email }}</dd>
+                </dl>
+            </div>
+        </div>
 
-        <p class="lead">Dados de endereço</p>
-        <p>Caso precise editar, <a href="{% url 'perfil:criar' %}">clique aqui</a></p>
-        <dl class="row">
-            <dt class="col-lg-2">Endereço:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.endereco }}</dd>
-            <dt class="col-lg-2">Número:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.numero }}</dd>
+        <!-- Endereço -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">Endereço de entrega</h5>
+                    <small class="text-muted">Este será utilizado para envio dos produtos.</small>
+                </div>
+                <a href="{% url 'perfil:criar' %}" class="btn btn-sm btn-outline-primary">
+                    Editar
+                </a>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-3 col-lg-3">Endereço</dt>
+                    <dd class="col-sm-9 col-lg-9">
+                        {{ usuario.perfil.endereco }}, {{ usuario.perfil.numero }}
+                        {% if usuario.perfil.complemento %}
+                        - {{ usuario.perfil.complemento }}
+                        {% endif %}
+                    </dd>
 
-            <dt class="col-lg-2">Complemento:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.complemento }}</dd>
-            <dt class="col-lg-2">Nascimento:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.bairro }}</dd>
+                    <dt class="col-sm-3 col-lg-3">Bairro</dt>
+                    <dd class="col-sm-9 col-lg-9">{{ usuario.perfil.bairro }}</dd>
 
-            <dt class="col-lg-2">Cidade:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.cidade }}</dd>
-            <dt class="col-lg-2">Estado:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.estado }}</dd>
+                    <dt class="col-sm-3 col-lg-3">Cidade/UF</dt>
+                    <dd class="col-sm-9 col-lg-9">
+                        {{ usuario.perfil.cidade }} - {{ usuario.perfil.estado }}
+                    </dd>
 
-            <dt class="col-lg-2">CEP:</dt>
-            <dd class="col-lg-4">{{ usuario.perfil.cep }}</dd>
-        </dl>
+                    <dt class="col-sm-3 col-lg-3">CEP</dt>
+                    <dd class="col-sm-9 col-lg-9">{{ usuario.perfil.cep }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumo financeiro e botão de finalizar -->
+    <div class="col-lg-5 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Resumo da compra</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2 text-muted">
+                    Confira o valor total antes de concluir seu pedido.
+                </p>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="font-weight-bold">Total do carrinho</span>
+                    <span class="h5 mb-0 text-success">
+                        {{ carrinho|cart_totals|formata_preco }}
+                    </span>
+                </div>
+
+                <p class="small text-muted mb-4">
+                    Eventuais ajustes de frete ou condições de pagamento podem ser apresentados na próxima etapa.
+                </p>
+
+                <a class="btn btn-primary btn-lg btn-block" href="{% url 'pedido:salvarpedido' %}">
+                    Realizar pedido e pagar
+                </a>
+
+                <a href="{% url 'produto:lista' %}" class="btn btn-link btn-sm d-block mt-2 p-0">
+                    <i class="fas fa-arrow-left mr-1"></i> Voltar para os produtos
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
-
-
-<div class="row mt-3">
+<!-- Lista dos itens do carrinho -->
+<div class="row mb-4">
     <div class="col">
-        <h3>Resumo do carrinho</h3>
-        <p class="lead">Os produtos, quantidades e preços que você escolheu.</p>
-
-        {% include 'parciais/_carrinho.html' %}
-    </div>
-
-</div>
-<div class="row mt-3">
-    <div class="col">
-        <p class="lead text-center"><span class="font-weight-bold">Total do carrinho:</span>
-            {{ carrinho|cart_totals|formata_preco }}</p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col">
-        <a class="btn btn-block btn-primary btn-lg" href="{% url 'pedido:salvarpedido' %}">
-            Realizar pedido e pagar
-        </a>
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Itens do carrinho</h5>
+                <small class="text-muted">
+                    Produtos, quantidades e preços selecionados.
+                </small>
+            </div>
+            <div class="card-body p-0">
+                {% include 'parciais/_carrinho.html' %}
+            </div>
+        </div>
     </div>
 </div>
-
-
 {% endblock %}

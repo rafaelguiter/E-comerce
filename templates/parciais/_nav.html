@@ -1,64 +1,89 @@
 {% load omfilters %}
 
-<nav class="navbar navbar-dark bg-primary navbar-expand-lg">
-    <div class="container w-100 d-flex justify-content-between align-items-center">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
         <!-- Marca -->
-        <a class="navbar-brand" href="{% url 'produto:lista' %}">Shoope -- FY</a>
+        <a class="navbar-brand font-weight-bold" href="{% url 'produto:lista' %}">
+            <i class="fas fa-store mr-2"></i>
+            Start<span class="text-warning">Shop</span>
+        </a>
 
-        <!-- Formulário centralizado -->
-        <form class="d-flex" method="GET" action="{% url 'produto:busca' %}" style="flex: 1; max-width: 600px; margin: 0 20px;">
-            <input name="termo" value="{{ request.GET.termo }}" 
-                   class="form-control mr-2" 
-                   type="search" 
-                   placeholder="Busca" 
-                   aria-label="Busca"
-                   style="flex: 1; font-size: 1.1rem; padding: .5rem 1rem;">
-            <button class="btn btn-secondary" type="submit" style="font-size: 1.1rem;">Busca</button>
-        </form>
+        <!-- Botão mobile -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar"
+            aria-controls="mainNavbar" aria-expanded="false" aria-label="Alternar navegação">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <!-- Menu à direita -->
-        <ul class="navbar-nav d-flex flex-row">
+        <!-- Conteúdo colapsável -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <!-- Busca centralizada -->
+            <form class="mx-lg-auto my-3 my-lg-0 w-100 w-lg-50" method="GET" action="{% url 'produto:busca' %}">
+                <div class="input-group">
+                    <input name="termo" value="{{ request.GET.termo }}" class="form-control" type="search"
+                        placeholder="Buscar produtos..." aria-label="Buscar produtos" />
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-light" type="submit">
+                            <i class="fas fa-search mr-1"></i> Buscar
+                        </button>
+                    </div>
+                </div>
+            </form>
 
-            {% if request.session.carrinho %}
-                <li class="nav-item mx-2">
-                    <a class="nav-link nav-cart-link active" href="{% url 'produto:carrinho' %}">
-                        <span class="nav-cart-text mr-1">
-                            Carrinho
-                        </span>
-                        <span class="nav-cart-count mr-1">
-                            <strong>{{ request.session.carrinho|cart_total_qtd }}x</strong>
-                        </span>
+            <!-- Menu à direita -->
+            <ul class="navbar-nav ml-lg-auto align-items-lg-center">
+                {% if request.session.carrinho %}
+                <li class="nav-item mx-lg-2 my-1 my-lg-0">
+                    <a class="nav-link d-flex align-items-center nav-cart-link" href="{% url 'produto:carrinho' %}">
                         <span class="nav-cart-icon mr-2">
                             <i class="fas fa-shopping-cart"></i>
                         </span>
+                        <span class="nav-cart-text d-none d-md-inline mr-1">
+                            Carrinho
+                        </span>
+                        <span class="badge badge-pill badge-light nav-cart-count">
+                            {{ request.session.carrinho|cart_total_qtd }}x
+                        </span>
                     </a>
                 </li>
-            {% endif %}
-
-            {% if request.user.is_authenticated %}
-                <li class="nav-item mx-2">
-                    <a class="nav-link" href="#">Olá, {{ user.username }}</a>
+                {% endif %} {% if request.user.is_authenticated %}
+                <li class="nav-item mx-lg-2 my-1 my-lg-0">
+                    <span class="nav-link">
+                        <i class="fas fa-user mr-1"></i>
+                        Olá, {{ user.username }}
+                    </span>
                 </li>
-                <li class="nav-item dropdown mx-2">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
+
+                <li class="nav-item dropdown mx-lg-2 my-1 my-lg-0">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownConta" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Conta
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="{% url 'pedido:lista' %}">Meus pedidos</a>
-                        <a class="dropdown-item" href="{% url 'perfil:criar' %}">Atualizar meus dados</a>
-                        <a class="dropdown-item" href="{% url 'perfil:logout' %}">Sair</a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownConta">
+                        <a class="dropdown-item" href="{% url 'pedido:lista' %}">
+                            <i class="fas fa-box mr-2"></i> Meus pedidos
+                        </a>
+                        <a class="dropdown-item" href="{% url 'perfil:criar' %}">
+                            <i class="fas fa-id-card mr-2"></i> Atualizar meus dados
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item text-danger" href="{% url 'perfil:logout' %}">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Sair
+                        </a>
                     </div>
                 </li>
-            {% else %}
-                <li class="nav-item mx-2">
-                    <a class="nav-link" href="{% url 'perfil:criar' %}">Entrar</a>
+                {% else %}
+                <li class="nav-item mx-lg-2 my-1 my-lg-0">
+                    <a class="nav-link" href="{% url 'perfil:criar' %}">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Entrar
+                    </a>
                 </li>
-                <li class="nav-item mx-2">
-                    <a class="nav-link" href="{% url 'perfil:registro' %}">Criar conta</a>
+                <li class="nav-item mx-lg-2 my-1 my-lg-0">
+                    <a class="nav-link" href="{% url 'perfil:registro' %}">
+                        <i class="fas fa-user-plus mr-1"></i> Criar conta
+                    </a>
                 </li>
-            {% endif %}
-
-        </ul>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </nav>
