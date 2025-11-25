@@ -76,9 +76,11 @@ WSGI_APPLICATION = 'loja.wsgi.application'
 
 
 
+
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -86,21 +88,21 @@ DATABASES = {
     }
 }
 
+"""
 
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'vendas',   # nome do banco que você criou no MySQL
-#         'USER': 'root',            # ou outro usuário configurado
-#         'PASSWORD': '1234',   # senha do usuário MySQL
-#         'HOST': '127.0.0.1',       # ou o IP do servidor MySQL
-#         'PORT': '3306',            # porta padrão do MySQL
-#         'OPTIONS': {
-#             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-#         },
-#     }
-# }
+DATABASES = {
+     'default': {
+         'ENGINE': 'django.db.backends.mysql',
+         'NAME': 'projeto',   # nome do banco que você criou no MySQL
+         'USER': 'root',            # ou outro usuário configurado
+         'PASSWORD': '1234',   # senha do usuário MySQL
+         'HOST': '127.0.0.1',       # ou o IP do servidor MySQL
+         'PORT': '3306',            # porta padrão do MySQL
+         'OPTIONS': {
+             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+         },
+     }
+}
 
 
 
