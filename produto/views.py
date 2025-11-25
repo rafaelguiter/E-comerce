@@ -217,7 +217,7 @@ class ResumoDaCompra(View):
             messages.error(self.request, 'Usuário sem perfil.')
             return redirect('perfil:criar')
 
-        carrinho = self.request.session.get('carrinho')
+        carrinho = self.request.session.get('carrinho', {}) # tirar
         if not carrinho:
             messages.error(self.request, 'Carrinho vazio.')
             return redirect('produto:lista')
