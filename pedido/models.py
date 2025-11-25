@@ -15,11 +15,13 @@ class Pedido(models.Model):
             ('A', 'Aprovado'),
             ('C', 'Pendente de Pagamento'),
             ('R', 'Reprovado'),
-            ('P', 'Pendente'),
-            ('E', 'Enviado'),
+            ('P', 'Cancelado'),
+            ('E', 'Em Transito'),
             ('F', 'Finalizado'),
         )
     )
+    
+    motivo_cancelamento = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f'Pedido N. {self.pk}'

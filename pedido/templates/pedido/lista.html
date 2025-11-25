@@ -45,15 +45,23 @@
                                     {{ pedido.qtd_total }}
                                 </td>
                                 <td class="align-middle">
-                                    <span class="badge badge-secondary">
-                                        {{ pedido.get_status_display }}
-                                    </span>
+                                    {% if pedido.status == 'A' %}
+                                        <span class="badge badge-success">{{ pedido.get_status_display }}</span>
+                                    {% elif pedido.status == 'C' %}
+                                        <span class="badge badge-warning">{{ pedido.get_status_display }}</span>
+                                    {% elif pedido.status == 'P' %}
+                                        <span class="badge badge-danger">{{ pedido.get_status_display }}</span>
+                                    {% elif pedido.status == 'T' %}
+                                        <span class="badge text-white" style="background-color:#8B4513;">{{ pedido.get_status_display }}</span>
+                                    {% elif pedido.status == 'F' %}
+                                        <span class="badge badge-secondary">{{ pedido.get_status_display }}</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">{{ pedido.get_status_display }}</span>
+                                    {% endif %}
                                 </td>
                                 <td class="align-middle text-right">
-                                    <a href="{% url 'pedido:detalhe' pedido.id %}"
-                                        class="btn btn-sm btn-outline-primary">
-                                        Ver detalhes
-                                        <i class="fas fa-search-plus ml-1"></i>
+                                    <a href="{% url 'pedido:detalhe' pedido.id %}" class="btn btn-sm btn-outline-primary">
+                                        Ver detalhes <i class="fas fa-search-plus ml-1"></i>
                                     </a>
                                 </td>
                             </tr>
@@ -78,4 +86,5 @@
 </div>
 
 {% include 'parciais/_pagination.html' %}
+
 {% endblock %}

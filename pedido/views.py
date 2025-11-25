@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView
 from django.views import View
 from django.contrib import messages
 from django.conf import settings
+from . import models
 
 from produto.models import Variacao
 from .models import Pedido, ItemPedido
@@ -225,3 +226,29 @@ def pagamento_cancelado(request, pk):
         'Pagamento não foi concluído. Você pode tentar novamente.'
     )
     return render(request, 'pedido/pagamento_cancelado.html', {'pedido': pedido})
+
+
+class CancelarPedido(View):
+
+    def post(self, request, pk):
+        if not request.user.is_authenticated:
+            messages.error(request, 'Você precisa estar logado para cancelar pedidos.')
+            return redirect('perfil:criar')
+
+        pedido = get_object_or_404(models.Pedido, pk=pk, usuario=request.user)
+
+        motivo = request.POST.get('motivo', '').strip()  # comentário opcional
+
+        # Status que exigem motivo
+        if pedido.status in ['A', 'E'] and not motivo:
+            messages.error(request, 'Por favor, informe o motivo do cancelamento.')
+            return redirect('pedido:pagar', pk=pedido.pk)
+
+        # Atualiza status do pedido para 'R' (Reprovado/Cancelado)
+        pedido.status = 'P'
+        if motivo:
+            pedido.motivo_cancelamento = motivo  # Campo novo no modelo Pedido
+        pedido.save()
+
+        messages.success(request, 'Pedido cancelado com sucesso.')
+        return redirect('pedido:lista')

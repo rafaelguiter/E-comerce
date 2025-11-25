@@ -13,4 +13,5 @@ urlpatterns = [
     # retorno da Stripe
     path('pagamento-sucesso/<int:pk>/', views.pagamento_sucesso, name='pagamento_sucesso'),
     path('pagamento-cancelado/<int:pk>/', views.pagamento_cancelado, name='pagamento_cancelado'),
+    path('cancelar/<int:pk>/', views.CancelarPedido.as_view(), name='cancelar'),
 ]
