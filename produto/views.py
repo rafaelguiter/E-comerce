@@ -183,15 +183,7 @@ class RemoverDoCarrinho(View):
         self.request.session.save()
         return redirect(http_referer)
 
-"""
-class Carrinho(View):
-    def get(self, *args, **kwargs):
-        contexto = {
-            'carrinho': self.request.session.get('carrinho', {})
-        }
 
-        return render(self.request, 'produto/carrinho.html', contexto)
-"""
 
 class Carrinho(View):
     def get(self, *args, **kwargs):
@@ -215,37 +207,6 @@ class Carrinho(View):
 
         return render(self.request, 'produto/carrinho.html', contexto)
 
-
-"""
-class ResumoDaCompra(View):
-    def get(self, *args, **kwargs):
-        if not self.request.user.is_authenticated:
-            return redirect('perfil:criar')
-
-        perfil = Perfil.objects.filter(usuario=self.request.user).exists()
-
-        if not perfil:
-            messages.error(
-                self.request,
-                'Usuário sem perfil.'
-            )
-            return redirect('perfil:criar')
-
-        if not self.request.session.get('carrinho'):
-            messages.error(
-                self.request,
-                'Carrinho vazio.'
-            )
-            return redirect('produto:lista')
-
-        contexto = {
-            'usuario': self.request.user,
-            'carrinho': self.request.session['carrinho'],
-        }
-
-        return render(self.request, 'produto/resumodacompra.html', contexto)
-
-"""
 
 class ResumoDaCompra(View):
     def get(self, *args, **kwargs):
@@ -280,15 +241,6 @@ class ResumoDaCompra(View):
 
         return render(self.request, 'produto/resumodacompra.html', contexto)
 
-
-""" 
-# funcao para calcular frente 
-def frete(request):
-    cidade = request.GET.get("cidade", "")
-    valor = calcular_frete(cidade)
-    return JsonResponse({"frete": valor})            
- 
-"""
 
 def frete(request):
     cidade = request.GET.get("cidade", "")

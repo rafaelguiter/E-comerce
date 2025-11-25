@@ -102,6 +102,7 @@ class SalvarPedido(View):
             .filter(id__in=carrinho_variacao_ids)
         )
 
+        # Verifica estoque
         for variacao in bd_variacoes:
             vid = str(variacao.id)
 
@@ -110,39 +111,40 @@ class SalvarPedido(View):
             preco_unt = carrinho[vid]['preco_unitario']
             preco_unt_promo = carrinho[vid]['preco_unitario_promocional']
 
-            error_msg_estoque = ''
-
             if estoque < qtd_carrinho:
                 carrinho[vid]['quantidade'] = estoque
                 carrinho[vid]['preco_quantitativo'] = estoque * preco_unt
                 carrinho[vid]['preco_quantitativo_promocional'] = estoque * preco_unt_promo
 
-                error_msg_estoque = (
-                    'Estoque insuficiente para alguns '
-                    'produtos do seu carrinho. '
-                    'Reduzimos a quantidade desses produtos. Por favor, '
-                    'verifique quais produtos foram afetados a seguir.'
-                )
-
-            if error_msg_estoque:
                 messages.error(
                     self.request,
-                    error_msg_estoque
+                    'Estoque insuficiente para alguns produtos. Quantidades ajustadas.'
                 )
                 self.request.session.save()
                 return redirect('produto:carrinho')
 
-        qtd_total_carrinho = utils.cart_total_qtd(carrinho)
-        valor_total_carrinho = utils.cart_totals(carrinho)
+        # Calcula subtotal do carrinho
+        subtotal_carrinho = utils.cart_totals(carrinho)
 
+        # Recupera frete da sessão (NOVO)
+        frete = self.request.session.get('frete', 0)
+
+        # Soma frete ao total (NOVO)
+        valor_total_carrinho = subtotal_carrinho + frete
+
+        qtd_total_carrinho = utils.cart_total_qtd(carrinho)
+
+        # Cria Pedido com frete incluído (NOVO: frete opcional se tiver campo no modelo)
         pedido = Pedido(
             usuario=self.request.user,
             total=valor_total_carrinho,
             qtd_total=qtd_total_carrinho,
-            status='C',  # Ex.: "Criado / Aguardando pagamento"
+            frete=frete,  # só se o modelo Pedido tiver campo frete
+            status='C',  # Criado / Aguardando pagamento
         )
         pedido.save()
 
+        # Cria itens do pedido
         ItemPedido.objects.bulk_create(
             [
                 ItemPedido(
@@ -159,14 +161,18 @@ class SalvarPedido(View):
             ]
         )
 
+        # Limpa carrinho
         del self.request.session['carrinho']
+        self.request.session.save()
 
+        # Redireciona para página de pagamento
         return redirect(
             reverse(
                 'pedido:pagar',
                 kwargs={'pk': pedido.pk}
             )
         )
+
 
 
 class Detalhe(DispatchLoginRequiredMixin, DetailView):
@@ -210,6 +216,9 @@ def pagamento_cancelado(request, pk):
         return redirect('perfil:criar')
 
     pedido = get_object_or_404(Pedido, pk=pk, usuario=request.user)
+    
+    pedido.status = 'R'  # Reprovado
+    pedido.save()
 
     messages.warning(
         request,

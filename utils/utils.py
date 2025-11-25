@@ -1,5 +1,9 @@
 def formata_preco(val):
-    return f'R$ {val:.2f}'.replace('.', ',')
+    try:
+        val_float = float(val)
+        return f'R$ {val_float:.2f}'.replace('.', ',')
+    except (ValueError, TypeError):
+        return str(val)
 
 
 def cart_total_qtd(carrinho):

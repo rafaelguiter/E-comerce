@@ -37,31 +37,39 @@
     </div>
 
     <!-- Coluna lateral: resumo rápido -->
-    <div class="col-lg-4 mb-4">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">Resumo rápido</h5>
-            </div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-5">Número</dt>
-                    <dd class="col-7">#{{ pedido.id }}</dd>
 
-                    <dt class="col-5">Total</dt>
-                    <dd class="col-7">{{ pedido.total|formata_preco }}</dd>
+<div class="col-lg-4 mb-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Resumo rápido</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-3">
+                <dt class="col-5">Número</dt>
+                <dd class="col-7">#{{ pedido.id }}</dd>
 
-                    <dt class="col-5">Qtd. itens</dt>
-                    <dd class="col-7">{{ pedido.qtd_total }}</dd>
+                <dt class="col-5">Total</dt>
+                <dd class="col-7">{{ pedido.total|formata_preco }}</dd>
 
-                    <dt class="col-5">Status</dt>
-                    <dd class="col-7">
-                        <span class="badge badge-secondary">
-                            {{ pedido.get_status_display }}
-                        </span>
-                    </dd>
-                </dl>
-            </div>
+                <dt class="col-5">Qtd. itens</dt>
+                <dd class="col-7">{{ pedido.qtd_total }}</dd>
+
+                <dt class="col-5">Status</dt>
+                <dd class="col-7">
+                    <span class="badge badge-secondary">
+                        {{ pedido.get_status_display }}
+                    </span>
+                </dd>
+            </dl>
+
+            <!-- Botão para pagar se o pedido estiver pendente -->
+            {% if pedido.status == 'C' %}
+            <a href="{% url 'pedido:pagar' pedido.id %}" class="btn btn-primary btn-block mt-2">
+                Pagar Pedido
+            </a>
+            {% endif %}
         </div>
     </div>
 </div>
+
 {% endblock %}

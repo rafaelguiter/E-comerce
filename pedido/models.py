@@ -6,12 +6,14 @@ class Pedido(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     total = models.FloatField()
     qtd_total = models.PositiveIntegerField()
+    frete = models.FloatField(default=0)  # <- adicionado
+
     status = models.CharField(
         default="C",
         max_length=1,
         choices=(
             ('A', 'Aprovado'),
-            ('C', 'Criado'),
+            ('C', 'Pendente de Pagamento'),
             ('R', 'Reprovado'),
             ('P', 'Pendente'),
             ('E', 'Enviado'),
